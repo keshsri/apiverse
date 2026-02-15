@@ -1,0 +1,38 @@
+# CDK
+infra/cdk/node_modules/
+infra/cdk/cdk.out/
+infra/cdk/dist/
+infra/cdk/*.js
+infra/cdk/*.d.ts
+infra/cdk/cdk.context.json
+
+# Python
+services/api/__pycache__/
+services/api/**/__pycache__/
+services/api/*.pyc
+services/api/.pytest_cache/
+services/api/venv/
+services/api/.venv/
+services/api/**/*.egg-info/
+
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+*.local.ts
+secrets.json
+
+# AWS
+.aws-sam/
+samconfig.toml
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# OS
+Thumbs.db
+*.log
