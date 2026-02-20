@@ -49,6 +49,8 @@ export class ApiVerseStack extends cdk.Stack {
             rdsSecretArn: rdsConstruct.secret.secretArn,
             databaseName: databaseName,
             apiLambdaSecurityGroup: lambdaConstruct.securityGroup,
+            redisEndpoint: redisConstruct.endpoint,
+            redisPort: redisConstruct.port,
         });
 
 

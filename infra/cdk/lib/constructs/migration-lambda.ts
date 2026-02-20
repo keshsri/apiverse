@@ -12,6 +12,8 @@ export interface MigrationLambdaConstructProps {
     rdsSecretArn: string;
     databaseName: string;
     apiLambdaSecurityGroup: ec2.SecurityGroup;
+    redisEndpoint: string;
+    redisPort: string;
 }
 
 export class MigrationLambdaConstruct extends Construct {
@@ -38,15 +40,16 @@ export class MigrationLambdaConstruct extends Construct {
             securityGroups: [props.apiLambdaSecurityGroup],
 
             environment: {
+                DATABASE_URL: `postgresql://placeholder:placeholder@${props.rdsEndpoint}:${props.rdsPort}/${props.databaseName}`,
                 RDS_ENDPOINT: props.rdsEndpoint,
                 RDS_PORT: props.rdsPort,
                 DATABASE_NAME: props.databaseName,
                 RDS_SECRET_ARN: props.rdsSecretArn,
                 
-                REDIS_HOST: 'dummy',
-                REDIS_PORT: '6379',
+                REDIS_HOST: props.redisEndpoint,
+                REDIS_PORT: props.redisPort,
                 
-                JWT_SECRET_KEY: 'dummy',
+                JWT_SECRET_KEY: 'migration-only-not-used',
                 JWT_ALGORITHM: 'HS256',
             },
         });
