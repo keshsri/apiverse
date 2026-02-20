@@ -6,6 +6,7 @@ import { RedisConstruct } from './constructs/redis';
 import { LambdaConstruct } from './constructs/lambda';
 import { ApiGatewayConstruct } from './constructs/api-gateway';
 import { WebhooksConstruct } from './constructs/webhooks';
+import { MigrationLambdaConstruct } from './constructs/migration-lambda';
 
 export interface ApiVerseStackProps extends cdk.StackProps {
     databaseName?: string;
@@ -40,6 +41,16 @@ export class ApiVerseStack extends cdk.Stack {
             redisPort: redisConstruct.port,
             databaseName: databaseName,
         });
+
+        const migrationLambdaConstruct = new MigrationLambdaConstruct(this, 'MigrationLambda', {
+            vpc: vpcConstruct.vpc,
+            rdsEndpoint: rdsConstruct.instance.dbInstanceEndpointAddress,
+            rdsPort: rdsConstruct.instance.dbInstanceEndpointPort,
+            rdsSecretArn: rdsConstruct.secret.secretArn,
+            databaseName: databaseName,
+            apiLambdaSecurityGroup: lambdaConstruct.securityGroup,
+        });
+
 
         rdsConstruct.allowConnectionsFrom(lambdaConstruct.securityGroup);
         redisConstruct.allowConnectionsFrom(lambdaConstruct.securityGroup);
@@ -99,6 +110,13 @@ export class ApiVerseStack extends cdk.Stack {
             description: 'Webhook SQS Queue URL',
             exportName: 'ApiVerseWebhookQueueUrl',
         });
+
+        new cdk.CfnOutput(this, 'MigrationLambdaArn', {
+            value: migrationLambdaConstruct.getFunctionArn(),
+            description: 'Migration Lambda Function ARN',
+            exportName: 'ApiVerseMigrationLambdaArn',
+        });
+
 
         cdk.Tags.of(this).add('Project', 'ApiVerse');
         cdk.Tags.of(this).add('Environment', 'dev');
