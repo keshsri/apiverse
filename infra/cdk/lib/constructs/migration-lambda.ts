@@ -20,6 +20,12 @@ export class MigrationLambdaConstruct extends Construct {
     constructor(scope: Construct, id: string, props: MigrationLambdaConstructProps) {
         super(scope, id);
 
+        const logGroup = new logs.LogGroup(this, 'MigrationLogGroup', {
+            logGroupName: `/aws/lambda/apiverse-migrate`,
+            retention: logs.RetentionDays.ONE_WEEK,
+            removalPolicy: cdk.RemovalPolicy.DESTROY,
+        });
+
         this.function = new lambda.DockerImageFunction(this, 'MigrationFunction', {
             code: lambda.DockerImageCode.fromImageAsset('../../services/api', {
                 file: 'Dockerfile.migrate',
@@ -46,11 +52,9 @@ export class MigrationLambdaConstruct extends Construct {
                 
                 JWT_SECRET_KEY: 'dummy',
                 JWT_ALGORITHM: 'HS256',
-                
-                AWS_REGION: 'eu-west-1',
             },
 
-            logRetention: logs.RetentionDays.ONE_WEEK,
+            logGroup: logGroup,
         });
 
         this.function.addToRolePolicy(new iam.PolicyStatement({
