@@ -61,7 +61,7 @@ export class RdsConstruct extends Construct {
             storageType: rds.StorageType.GP3,
             storageEncrypted: true,
 
-            backupRetention: cdk.Duration.days(7),
+            backupRetention: cdk.Duration.days(1), 
             deleteAutomatedBackups: true,
 
             multiAz: false,
