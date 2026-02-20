@@ -38,7 +38,9 @@ export class MigrationLambdaConstruct extends Construct {
             securityGroups: [props.apiLambdaSecurityGroup],
 
             environment: {
-                DATABASE_URL: `postgresql://apiverse_admin:password@${props.rdsEndpoint}:${props.rdsPort}/${props.databaseName}`,
+                RDS_ENDPOINT: props.rdsEndpoint,
+                RDS_PORT: props.rdsPort,
+                DATABASE_NAME: props.databaseName,
                 RDS_SECRET_ARN: props.rdsSecretArn,
                 
                 REDIS_HOST: 'dummy',
