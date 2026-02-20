@@ -36,7 +36,6 @@ export class LambdaConstruct extends Construct {
             functionName: 'apiverse-api',
             description: 'APIVerse FastAPI application',
 
-            architecture: lambda.Architecture.ARM_64,
             memorySize: 512,
             timeout: cdk.Duration.seconds(30),
 
