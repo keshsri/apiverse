@@ -17,6 +17,8 @@ services/api/**/*.egg-info/
 
 # Environment variables & secrets
 .env
+**/.env
+services/api/.env
 .env.local
 .env.*.local
 *.local.ts
@@ -36,3 +38,4 @@ samconfig.toml
 # OS
 Thumbs.db
 *.log
+docs/FEATURES.md
