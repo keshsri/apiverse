@@ -40,6 +40,14 @@ export class MigrationLambdaConstruct extends Construct {
             environment: {
                 DATABASE_URL: `postgresql://apiverse_admin:password@${props.rdsEndpoint}:${props.rdsPort}/${props.databaseName}`,
                 RDS_SECRET_ARN: props.rdsSecretArn,
+                
+                REDIS_HOST: 'dummy',
+                REDIS_PORT: '6379',
+                
+                JWT_SECRET_KEY: 'dummy',
+                JWT_ALGORITHM: 'HS256',
+                
+                AWS_REGION: 'eu-west-1',
             },
 
             logRetention: logs.RetentionDays.ONE_WEEK,
