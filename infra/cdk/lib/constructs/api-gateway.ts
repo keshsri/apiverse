@@ -49,6 +49,8 @@ export class ApiGatewayConstruct extends Construct {
             allowTestInvoke: true,
         });
 
+        this.api.root.addMethod('ANY', lambdaIntegration);
+
         this.api.root.addProxy({
             defaultIntegration: lambdaIntegration,
             anyMethod: true, 
