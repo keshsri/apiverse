@@ -38,10 +38,6 @@ from alembic.config import Config
 from alembic import command
 
 def handler(event, context):
-    """
-    Lambda handler for running Alembic migrations.
-    Can be invoked manually or from GitHub Actions.
-    """
     try:
         if not database_url:
             return {
