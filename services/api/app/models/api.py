@@ -12,12 +12,12 @@ class API(Base):
     name = Column(String(255), nullable=False)
     description = Column(Text, nullable=True)
     base_url = Column(String(512), nullable=False)
-
+    auth_type = Column(String(50), nullable=False, default="none")
     auth_config = Column(JSON, nullable=True)
 
     is_active = Column(Boolean, default = True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     owner = relationship("User", back_populates="apis")
     versions = relationship("APIVersion", back_populates="api", cascade="all, delete-orphan")

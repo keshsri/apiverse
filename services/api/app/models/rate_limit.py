@@ -14,6 +14,6 @@ class RateLimit(Base):
     requests_per_day = Column(Integer, default= 1000)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     api = relationship("API", back_populates="rate_limits")
