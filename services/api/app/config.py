@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     VERSION: str = "0.1.0"
 
-    DATABASE_URL: str
+    DATABASE_URL: str = ""
 
     REDIS_HOST: str
     REDIS_PORT: int = 6379
@@ -20,7 +20,7 @@ class Settings(BaseSettings):
 
     class Config:
         env_file = ".env"
-        case_sensitive = "True"
+        case_sensitive = True
 
 @lru_cache()
 def get_settings() -> Settings:
