@@ -8,6 +8,9 @@ from app.config import get_settings
 
 settings = get_settings()
 
+engine = None
+SessionLocal = None
+
 def get_database_url():
     if settings.DATABASE_URL and not settings.DATABASE_URL.startswith("postgresql://placeholder"):
         return settings.DATABASE_URL
@@ -28,20 +31,23 @@ def get_database_url():
     
     return settings.DATABASE_URL
 
-database_url = get_database_url()
-
-engine = create_engine(
-    database_url,
-    pool_pre_ping=True,
-    pool_size=5,
-    max_overflow=10
-)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+def init_db():
+    global engine, SessionLocal
+    
+    if engine is None:
+        database_url = get_database_url()
+        engine = create_engine(
+            database_url,
+            pool_pre_ping=True,
+            pool_size=5,
+            max_overflow=10
+        )
+        SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
 def get_db():
+    init_db() 
     db = SessionLocal()
     try:
         yield db
