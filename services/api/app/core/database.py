@@ -12,9 +12,6 @@ engine = None
 SessionLocal = None
 
 def get_database_url():
-    if settings.DATABASE_URL and not settings.DATABASE_URL.startswith("postgresql://placeholder"):
-        return settings.DATABASE_URL
-    
     if settings.RDS_SECRET_ARN:
         client = boto3.client('secretsmanager')
         response = client.get_secret_value(SecretId=settings.RDS_SECRET_ARN)
@@ -28,7 +25,7 @@ def get_database_url():
         database_name = os.environ.get("DATABASE_NAME", "apiverse")
         
         return f"postgresql://{username}:{password}@{rds_endpoint}:{rds_port}/{database_name}"
-    
+        
     return settings.DATABASE_URL
 
 def init_db():

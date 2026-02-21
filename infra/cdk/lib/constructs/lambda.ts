@@ -46,7 +46,6 @@ export class LambdaConstruct extends Construct {
             securityGroups: [this.securityGroup],
 
             environment: {
-                DATABASE_URL: `postgresql://apiverse_admin:password@${props.rdsEndpoint}:${props.rdsPort}/${props.databaseName}`,
                 RDS_SECRET_ARN: props.rdsSecretArn,
                 RDS_ENDPOINT: props.rdsEndpoint,
                 RDS_PORT: props.rdsPort,
