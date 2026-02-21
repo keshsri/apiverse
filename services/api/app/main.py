@@ -1,11 +1,23 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from app.routers import auth
 
 app = FastAPI(
     title="APIverse",
     description="API Management Platform",
-    version="0.1.0"
+    version="0.1.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth.router)
@@ -25,4 +37,4 @@ def root():
         "docs": "/docs"
     }
 
-handler = Mangum(app)
+handler = Mangum(app, lifespan="off")
