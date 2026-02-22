@@ -39,3 +39,9 @@ samconfig.toml
 Thumbs.db
 *.log
 docs/FEATURES.md
+
+# Postman (exclude everything except collections)
+.postman/
+postman/environments/
+postman/globals/
+postman/specs/
