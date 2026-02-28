@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
-from app.routers import auth, apis, api_keys, proxy
+from app.routers import auth, apis, api_keys, proxy, rate_limits
 
 app = FastAPI(
     title="APIverse",
@@ -24,6 +24,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(apis.router)
 app.include_router(api_keys.router)
+app.include_router(rate_limits.router)
 app.include_router(proxy.router)
 
 @app.get("/health")

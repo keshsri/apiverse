@@ -9,7 +9,7 @@ from app.core.database import get_db
 from app.models.api_key import APIKey
 from app.models.api import API
 from app.models.usage_metric import UsageMetric
-from app.services import api_key_service
+from app.services import api_key_service, rate_limit_service
 from app.utils.logger import api_logger
 
 router = APIRouter(prefix="/proxy", tags=["Proxy"])
@@ -93,6 +93,28 @@ async def proxy_request(
     
     api_logger.info(f"Proxy request: api_id={api_id}, path={path}, method={request.method}, user_id={api_key.user_id}")
 
+    is_allowed, rate_limit_info = rate_limit_service.check_rate_limit(
+        db=db,
+        api_id=api_id,
+        api_key_id=api_key.id
+    )
+
+    if not is_allowed and rate_limit_info:
+        api_logger.warning(f"Rate limit exceeded for api_id={api_id}, key_id={api_key.id}")
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Rate limit exceeded",
+            headers={
+                "X-RateLimit-Limit-Hour": str(rate_limit_info["limit_hour"]),
+                "X-RateLimit-Remaining-Hour": str(rate_limit_info["remaining_hour"]),
+                "X-RateLimit-Reset-Hour": str(rate_limit_info["reset_hour"]),
+                "X-RateLimit-Limit-Day": str(rate_limit_info["limit_day"]),
+                "X-RateLimit-Remaining-Day": str(rate_limit_info["remaining_day"]),
+                "X-RateLimit-Reset-Day": str(rate_limit_info["reset_day"]),
+                "Retry-After": str(rate_limit_info["reset_hour"] - int(time.time()))
+            }
+        )
+
     api = db.query(API).filter(
         API.id == api_id,
         API.user_id == api_key.user_id
@@ -153,6 +175,14 @@ async def proxy_request(
             k: v for k, v in response.headers.items()
             if k.lower() not in excluded_headers
         }
+        
+        if rate_limit_info:
+            response_headers["X-RateLimit-Limit-Hour"] = str(rate_limit_info["limit_hour"])
+            response_headers["X-RateLimit-Remaining-Hour"] = str(rate_limit_info["remaining_hour"])
+            response_headers["X-RateLimit-Reset-Hour"] = str(rate_limit_info["reset_hour"])
+            response_headers["X-RateLimit-Limit-Day"] = str(rate_limit_info["limit_day"])
+            response_headers["X-RateLimit-Remaining-Day"] = str(rate_limit_info["remaining_day"])
+            response_headers["X-RateLimit-Reset-Day"] = str(rate_limit_info["reset_day"])
         
         return Response(
             content=response.content,
