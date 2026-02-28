@@ -9,7 +9,7 @@ from app.core.database import get_db
 from app.models.api_key import APIKey
 from app.models.api import API
 from app.models.usage_metric import UsageMetric
-from app.services import api_key_service, rate_limit_service
+from app.services import api_key_service, rate_limit_service, webhook_service
 from app.utils.logger import api_logger
 
 router = APIRouter(prefix="/proxy", tags=["Proxy"])
@@ -101,6 +101,17 @@ async def proxy_request(
 
     if not is_allowed and rate_limit_info:
         api_logger.warning(f"Rate limit exceeded for api_id={api_id}, key_id={api_key.id}")
+        
+        webhook_service.publish_event(
+            event_type='api.rate_limit',
+            api_id=api_id,
+            payload={
+                'api_key_id': api_key.id,
+                'limit_hour': rate_limit_info["limit_hour"],
+                'limit_day': rate_limit_info["limit_day"]
+            }
+        )
+        
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Rate limit exceeded",
@@ -164,6 +175,29 @@ async def proxy_request(
             status_code=response.status_code,
             response_time_ms=response_time_ms
         )
+
+        webhook_service.publish_event(
+            event_type='api.request',
+            api_id=api_id,
+            payload={
+                'endpoint': f"/{path}",
+                'method': request.method,
+                'status_code': response.status_code,
+                'response_time_ms': response_time_ms
+            }
+        )
+
+        if response.status_code >= 400:
+            webhook_service.publish_event(
+                event_type='api.error',
+                api_id=api_id,
+                payload={
+                    'endpoint': f"/{path}",
+                    'method': request.method,
+                    'status_code': response.status_code,
+                    'response_time_ms': response_time_ms
+                }
+            )
 
         excluded_headers = {
             "content-length",

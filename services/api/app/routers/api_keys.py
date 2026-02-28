@@ -8,7 +8,7 @@ from app.schemas.api_key import (
     APIKeyResponse,
     APIKeyListResponse
 )
-from app.services import api_key_service
+from app.services import api_key_service, webhook_service
 from app.utils.dependencies import get_current_user
 from app.utils.logger import api_logger
 
@@ -29,6 +29,17 @@ def create_api_key(
             name=key_data.name,
             environment=key_data.environment.value,
             expires_in_days=key_data.expires_in_days
+        )
+
+        webhook_service.publish_event(
+            event_type='api.key.created',
+            api_id=0,
+            payload={
+                'key_id': api_key.id,
+                'key_prefix': api_key.key_prefix,
+                'environment': api_key.environment,
+                'user_id': current_user.id
+            }
         )
 
         return APIKeyCreateResponse(
@@ -67,5 +78,14 @@ def revoke_api_key(
     if not success:
         api_logger.warning(f"API key not found or access denied: key_id: {key_id} for user: {current_user.id}")
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="API Key not found")
+
+    webhook_service.publish_event(
+        event_type='api.key.revoked',
+        api_id=0,
+        payload={
+            'key_id': key_id,
+            'user_id': current_user.id
+        }
+    )
 
     return None

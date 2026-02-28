@@ -41,18 +41,79 @@
   - Request/response forwarding with proper headers
   - Error handling (timeouts, connection errors)
 
+- **Rate Limiting**
+  - Redis-based rate limiting
+  - Per-API limits (requests per hour/day)
+  - Configurable tiers (standard, premium, enterprise)
+  - Rate limit headers in responses
+
+- **Analytics**
+  - Usage statistics (total requests, success/fail rates)
+  - Endpoint-level metrics
+  - Error distribution analysis
+  - Performance metrics (response times)
+
+- **Webhooks**
+  - Event subscriptions (api.request, api.error, api.rate_limit, etc.)
+  - EventBridge integration
+  - Delivery tracking and retry logic
+  - HMAC signature verification
+
 - **Usage Tracking**
   - Track every proxied request
   - Metrics: endpoint, method, status code, response time
   - Foundation for analytics and billing
 
+- **Frontend Dashboard**
+  - Streamlit-based web interface
+  - Complete API management UI
+  - Real-time analytics visualization
+  - Webhook configuration interface
+
 ### In Development
 
-- Rate limiting with Redis
-- Analytics dashboard
-- Webhooks implementation
 - AI-powered API testing
-- Frontend application
+
+## Frontend
+
+A modular Streamlit-based dashboard for managing and monitoring your APIs.
+
+**Features:**
+- User authentication
+- API management interface
+- API keys generation and management
+- Rate limits configuration
+- Analytics dashboard with charts
+- Webhooks management
+- Proxy tester for direct API testing
+
+**Structure:**
+```
+frontend/
+├── app.py              # Main application
+├── api_client.py       # API wrapper
+├── config.py           # Configuration
+└── pages/              # Modular page components
+    ├── auth.py
+    ├── dashboard.py
+    ├── apis.py
+    ├── api_keys.py
+    ├── rate_limits.py
+    ├── analytics.py
+    ├── webhooks.py
+    └── proxy_tester.py
+```
+
+**Setup:**
+```bash
+cd frontend
+pip install -r requirements.txt
+cp .env.example .env
+# Edit .env with your API URL
+streamlit run app.py
+```
+
+See [frontend/README.md](frontend/README.md) for detailed instructions.
 
 ## Architecture
 
